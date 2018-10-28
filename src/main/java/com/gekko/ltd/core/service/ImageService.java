@@ -21,7 +21,7 @@ public class ImageService {
     private static final ImageCompressor imageCompressor = ImageCompressor.getService();
     private static ImageService instance;
     private List<ColourGroup> colorGroups = new LinkedList<>();
-    private static final Integer RADIUS = 4;
+    private static final Integer RADIUS = 3;
 
     private ImageService() {
     }
@@ -289,22 +289,30 @@ public class ImageService {
     }
 
     public List<PixelRGB> makeOilEffect(List<PixelRGB> pixels, Integer width, Integer height) {
-        List<List<PixelRGB>> imgMatrix = getMatrixFromList(pixels, width, height);
-        List<PixelRGB> performedImgMatrix = new ArrayList<>();
+        List<List<PixelRGB>> imgMatrix = getMatrixFromList(pixels, width, height, true);
+        List<PixelRGB> performedImg = new ArrayList<>();
         for (int h = 0; h < height; h++) {
             for (int w = 0; w < width; w++) {
                 List<PixelRGB> area = getAreaForPixel(w, h, width, height, imgMatrix);
                 Map<PixelRGB, Integer> counter = new HashMap<>();
                 area.forEach(pixel -> putPixelToMap(pixel, counter));
                 if (!counter.isEmpty()) {
-                    PixelRGB pixel = counter.entrySet().stream().max(Comparator.comparingInt(Map.Entry::getValue)).orElse(null).getKey();
-                    performedImgMatrix.add(pixel);
+                    PixelRGB pixel;
+                    if (counter.size() == 1) {
+                        pixel = counter.entrySet().iterator().next().getKey();
+                    } else {
+                        pixel = counter.entrySet().stream().max(Comparator.comparingInt(Map.Entry::getValue)).orElse(null).getKey();
+                    }
+                    pixel = pixel.copy();
+                    pixel.setCoordinateX(w);
+                    pixel.setCoordinateY(h);
+                    performedImg.add(pixel);
                 } else {
                     throw new RuntimeException("Error in making oil effect");
                 }
             }
         }
-        return performedImgMatrix;
+        return performedImg;
     }
 
     private void putPixelToMap(PixelRGB pixel, Map<PixelRGB, Integer> counter) {
@@ -317,15 +325,25 @@ public class ImageService {
 
     private List<PixelRGB> getAreaForPixel(int x, int y, Integer width, Integer height, List<List<PixelRGB>> pixels) {
         List<PixelRGB> area = new ArrayList<>();
-        for (int i = (x - RADIUS + 1); i < (x + RADIUS - 1); i++) {
-            if (i < 0 || i >=height) {
+        for (int i = (x - RADIUS); i < (x + RADIUS); i++) {
+            if (i < 0 || i >= width) {
                 continue;
             }
-            for (int j = (y - RADIUS + 1); j < (y + RADIUS - 1); j++) {
-                if (j < 0 || j >= width) {
+            for (int j = (y - RADIUS); j < (y + RADIUS); j++) {
+                if (j < 0 || j >= height || i == j) {
                     continue;
                 }
-                if ((Math.abs(x - i) + Math.abs(y - j)) <= RADIUS) {
+                Integer diffX = Math.abs(x - i);
+                Integer diffY = Math.abs(y - j);
+                Double dist;
+                if (diffX == 0) {
+                    dist = diffY.doubleValue();
+                } else if (diffY == 0) {
+                    dist = diffX.doubleValue();
+                } else {
+                    dist = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
+                }
+                if (dist <= RADIUS) {
                     area.add(pixels.get(i).get(j));
                 }
             }
@@ -333,6 +351,7 @@ public class ImageService {
         return area;
     }
 
+    @Deprecated
     private List<ArrayList<PixelRGB>> createEmptyMatrix(Integer width, Integer height) {
         List<ArrayList<PixelRGB>> retList = new ArrayList<>();
         for (int i = 0; i < height; i++) {
@@ -341,17 +360,23 @@ public class ImageService {
         return retList;
     }
 
-    private List<List<PixelRGB>> getMatrixFromList(List<PixelRGB> pixels, Integer width, Integer height) {
+    private List<List<PixelRGB>> getMatrixFromList(List<PixelRGB> pixels, Integer width, Integer height,
+                                                   boolean performCheck) {
         if (pixels.size() != width * height) {
             throw new RuntimeException("wrong number of pixels");
         }
         List<List<PixelRGB>> retList = new ArrayList<>();
         int index = 0;
-        for (int i = 0; i < height; i++) {
+        for (int i = 0; i < width; i++) {
             List<PixelRGB> string = new ArrayList<>();
-                for (int j = 0; j < width; j++) {
-                    string.add(pixels.get(index++));
+            for (int j = 0; j < height; j++) {
+                PixelRGB p = pixels.get(index++);
+                if (performCheck && (!p.getCoordinateX().equals(i) || !p.getCoordinateY().equals(j))) {
+                    throw new RuntimeException("Not right position. Expected: (" + i + "," + j + "), " +
+                            "but was: (" + p.getCoordinateX() + "," + p.getCoordinateY() + ")");
                 }
+                string.add(p);
+            }
             retList.add(string);
         }
         return retList;

@@ -20,7 +20,8 @@ public class PictureReader {
     private static final String ROOT = System.getProperty("user.dir") + "/";
     private static PictureReader instance;
 
-    private PictureReader() {}
+    private PictureReader() {
+    }
 
     public static PictureReader getService() {
         if (instance == null) {

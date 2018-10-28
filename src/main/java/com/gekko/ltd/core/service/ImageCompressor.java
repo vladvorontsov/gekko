@@ -17,7 +17,7 @@ import java.util.Iterator;
  * Created by Anna on 14.10.2018.
  */
 public class ImageCompressor {
-    private static final Integer MAX_LENGHT = 500;
+    private static final Integer MAX_LENGTH = 500;
     private static ImageCompressor instance;
 
     private ImageCompressor() {
@@ -39,6 +39,7 @@ public class ImageCompressor {
         }
     }
 
+    @Deprecated
     public void createCompressedPicture() {
         File input = new File(PictureReader.NAME_OF_INPUT_FILE);
         try {
@@ -118,8 +119,8 @@ public class ImageCompressor {
         BufferedImage inputImage = ImageIO.read(inputFile);
         Integer biggestSide = Math.max(inputImage.getWidth(), inputImage.getHeight());
         double percent = 1;
-        if (biggestSide > MAX_LENGHT) {
-            percent = MAX_LENGHT.doubleValue() / biggestSide;
+        if (biggestSide > MAX_LENGTH) {
+            percent = MAX_LENGTH.doubleValue() / biggestSide;
         }
         int scaledWidth = (int) (inputImage.getWidth() * percent);
         int scaledHeight = (int) (inputImage.getHeight() * percent);

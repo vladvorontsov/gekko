@@ -61,7 +61,7 @@ public class PixelHSB extends Pixel {
         Double deltaHue = Math.pow(this.hue - pixelHSB.getHue(), 2);
         Double deltaSaturation = Math.pow(this.saturation - pixelHSB.getSaturation(), 2);
         Double deltaBrightness = Math.pow(this.brightness - pixelHSB.getBrightness(), 2);
-        return 6*deltaHue + 2*deltaSaturation + 3*deltaBrightness + 0.5*this.convertToRGB().getDistanceTo(pixelRGB);
+        return 6 * deltaHue + 2 * deltaSaturation + 3 * deltaBrightness + 0.5 * this.convertToRGB().getDistanceTo(pixelRGB);
     }
 
     @Override

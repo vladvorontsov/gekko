@@ -103,6 +103,7 @@ public class ColourGroup implements Comparable<ColourGroup> {
     public void setBlueMax(Integer blueMax) {
         this.blueMax = blueMax;
     }
+
     public boolean contains(PixelRGB pixel) {
         Integer red = pixel.getRed();
         Integer green = pixel.getGreen();

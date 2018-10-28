@@ -113,15 +113,15 @@ public class PixelRGB extends Pixel {
         }
         Double r = (pixelToCompare.getRed() + this.red) / 2.;
         Double deltaRed = Math.pow(pixelToCompare.getRed() - this.red, 2) / 255;
-        Double deltaGreen = Math.pow(pixelToCompare.getGreen() - this.green, 2) /255;
+        Double deltaGreen = Math.pow(pixelToCompare.getGreen() - this.green, 2) / 255;
         Double deltaBlue = Math.pow(pixelToCompare.getBlue() - this.blue, 2) / 255;
-        Double weightRed = 2 + r/256.;
-        Double weightBlue = 2 + (255 - r)/256.;
+        Double weightRed = 2 + r / 256.;
+        Double weightBlue = 2 + (255 - r) / 256.;
         //Integer temp1 = new Double((512 + r) * deltaRed).intValue();
         //Integer temp2 = new Double((767 - r) * deltaBlue).intValue();
         //return  Math.sqrt(2*deltaRed + 4*deltaGreen + 3*deltaBlue
         //+ r*(deltaRed - deltaBlue)/256);
-        return weightRed*deltaRed + 4*deltaGreen + weightBlue*deltaBlue;
+        return weightRed * deltaRed + 4 * deltaGreen + weightBlue * deltaBlue;
         //return Math.sqrt(deltaRed + deltaGreen + deltaBlue);
     }
 
@@ -142,5 +142,13 @@ public class PixelRGB extends Pixel {
         ArrayList<Integer> rgb = new ArrayList<>(Arrays.asList(red, green, blue));
         Integer max = rgb.stream().max(Integer::compareTo).orElse(0);
         return max.floatValue() / 255;
+    }
+
+    public PixelRGB copy() {
+        PixelRGB pixelRGB = new PixelRGB();
+        pixelRGB.setRed(this.red);
+        pixelRGB.setGreen(this.green);
+        pixelRGB.setBlue(this.blue);
+        return pixelRGB;
     }
 }

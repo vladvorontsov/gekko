@@ -32,25 +32,35 @@ public class Main {
         //imageCompressor.createCompressedPicture();
         pictureReader.createCopy();
         imageCompressor.resizeCompressedPicture();
-        System.out.println("Compressed picture created");
+        log("Compressed picture created");
+
         File compressedImgPath = pictureReader.getCompressedPicture();
         BufferedImage compressedImg = pictureReader.readPicture(compressedImgPath);
-        System.out.println("Picture reading done");
+        log("Picture reading done");
 
         List<Pixel> listOfPixels = imageService.getPixelList(img, clazz);
         List<Pixel> listOfCompressedPixels = imageService.getPixelList(compressedImg, false, clazz);
-        System.out.println("Pixels created");
+        log("Pixels created");
+
         List<Pixel> topColors = imageService.getTopColors(listOfCompressedPixels, clazz);
-        System.out.println("Top colors created");
+        log("Top colors created");
+
         List<PixelRGB> performedPixels = imageService.performImage(listOfPixels, topColors);
-        System.out.println("Clusters created");
-        imageService.makeOilEffect(performedPixels, width, height);
-        System.out.println("Oil effect applied");
+        log("Clusters created");
+
+        performedPixels = imageService.makeOilEffect(performedPixels, width, height);
+        log("Oil effect applied");
+
         BufferedImage performedImage = imageService.createBufferedImage(performedPixels, img.getWidth(), img.getHeight());
         pictureReader.saveImage(performedImage);
-        System.out.println("Image saved");
+        log("Image saved");
+
         LocalDateTime finish = LocalDateTime.now();
-        System.out.println("Number of top colors: " + topColors.size());
-        System.out.println("Process finished in " + ChronoUnit.MILLIS.between(start, finish) + "ms");
+        log("Number of top colors: " + topColors.size() + "\n" +
+                "Process finished in " + ChronoUnit.MILLIS.between(start, finish) + "ms");
+    }
+
+    private static void log(String message) {
+        System.out.println(message);
     }
 }
