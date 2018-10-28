@@ -17,6 +17,7 @@ public class PictureReader {
     public static final String NAME_OF_INPUT_FILE = "testPicture6.jpg";
     public static final String NAME_OF_COMPRESSED_FILE = "compressed.jpg";
     public static final String NAME_OF_RESULT_FILE = "result.jpg";
+    public static final String NAME_OF_CONTOUR_FILE = "contour.jpg";
     private static final String ROOT = System.getProperty("user.dir") + "/";
     private static PictureReader instance;
 
@@ -50,8 +51,8 @@ public class PictureReader {
         return getPictureInRootPath(NAME_OF_COMPRESSED_FILE);
     }
 
-    public void saveImage(BufferedImage image) {
-        File file = new File(NAME_OF_RESULT_FILE);
+    public void saveImage(BufferedImage image, String resultFileName) {
+        File file = new File(resultFileName);
         try {
             ImageIO.write(image, "JPG", file);
             Desktop.getDesktop().open(file);

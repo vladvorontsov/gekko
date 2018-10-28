@@ -48,12 +48,18 @@ public class Main {
         List<PixelRGB> performedPixels = imageService.performImage(listOfPixels, topColors);
         log("Clusters created");
 
-        performedPixels = imageService.makeOilEffect(performedPixels, width, height);
+        List<List<PixelRGB>> imgMatrix = imageService.getMatrixFromList(performedPixels, width, height, true);
+        performedPixels = imageService.makeOilEffect(imgMatrix, width, height);
         log("Oil effect applied");
 
-        BufferedImage performedImage = imageService.createBufferedImage(performedPixels, img.getWidth(), img.getHeight());
-        pictureReader.saveImage(performedImage);
-        log("Image saved");
+        saveAtFile(performedPixels, PictureReader.NAME_OF_RESULT_FILE, width, height);
+        log("Result saved");
+
+        imgMatrix = imageService.getMatrixFromList(performedPixels, width, height, true);
+        performedPixels = imageService.makeContour(imgMatrix, width, height);
+
+        saveAtFile(performedPixels, PictureReader.NAME_OF_CONTOUR_FILE, width, height);
+        log("Contour saved");
 
         LocalDateTime finish = LocalDateTime.now();
         log("Number of top colors: " + topColors.size() + "\n" +
@@ -62,5 +68,10 @@ public class Main {
 
     private static void log(String message) {
         System.out.println(message);
+    }
+
+    private static void saveAtFile(List<PixelRGB> pixels, String fileName, Integer width, Integer height) {
+        BufferedImage performedImage = imageService.createBufferedImage(pixels, width, height);
+        pictureReader.saveImage(performedImage, fileName);
     }
 }

@@ -6,8 +6,6 @@ import com.gekko.ltd.core.entity.PixelRGB;
 import com.gekko.ltd.core.entity.intface.Pixel;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -288,11 +286,10 @@ public class ImageService {
         return pixels;
     }
 
-    public List<PixelRGB> makeOilEffect(List<PixelRGB> pixels, Integer width, Integer height) {
-        List<List<PixelRGB>> imgMatrix = getMatrixFromList(pixels, width, height, true);
+    public List<PixelRGB> makeOilEffect(List<List<PixelRGB>> imgMatrix, Integer width, Integer height) {
         List<PixelRGB> performedImg = new ArrayList<>();
-        for (int h = 0; h < height; h++) {
-            for (int w = 0; w < width; w++) {
+        for (int w = 0; w < width; w++) {
+            for (int h = 0; h < height; h++) {
                 List<PixelRGB> area = getAreaForPixel(w, h, width, height, imgMatrix);
                 Map<PixelRGB, Integer> counter = new HashMap<>();
                 area.forEach(pixel -> putPixelToMap(pixel, counter));
@@ -330,7 +327,7 @@ public class ImageService {
                 continue;
             }
             for (int j = (y - RADIUS); j < (y + RADIUS); j++) {
-                if (j < 0 || j >= height || i == j) {
+                if (j < 0 || j >= height || (i == x && j == y)) {
                     continue;
                 }
                 Integer diffX = Math.abs(x - i);
@@ -360,8 +357,8 @@ public class ImageService {
         return retList;
     }
 
-    private List<List<PixelRGB>> getMatrixFromList(List<PixelRGB> pixels, Integer width, Integer height,
-                                                   boolean performCheck) {
+    public List<List<PixelRGB>> getMatrixFromList(List<PixelRGB> pixels, Integer width, Integer height,
+                                                  boolean performCheck) {
         if (pixels.size() != width * height) {
             throw new RuntimeException("wrong number of pixels");
         }
@@ -397,5 +394,42 @@ public class ImageService {
             res.setRGB(pixel.getCoordinateX(), pixel.getCoordinateY(), pixel.convertToIntValue());
         }
         return res;
+    }
+
+    public List<PixelRGB> makeContour(List<List<PixelRGB>> imgMatrix, Integer width, Integer height) {
+        List<PixelRGB> performedImg = new ArrayList<>();
+        for (int w = 0; w < width; w++) {
+            for (int h = 0; h < height; h++) {
+                PixelRGB pixelRGB;
+                if (hasDifferentNeighbourhood(imgMatrix, h, w, height, width)) {
+                    pixelRGB = PixelRGB.getBlackRGB();
+                } else {
+                    pixelRGB = PixelRGB.getWhiteRGB();
+                }
+                pixelRGB.setCoordinateX(w);
+                pixelRGB.setCoordinateY(h);
+                performedImg.add(pixelRGB);
+            }
+        }
+        return performedImg;
+    }
+
+    private boolean hasDifferentNeighbourhood(List<List<PixelRGB>> imgMatrix, int h, int w, Integer height, Integer width) {
+        PixelRGB center = imgMatrix.get(w).get(h);
+        for (int i = w - 1; i <= w + 1; i++) {
+            if (i < 0 || i >= width) {
+                continue;
+            }
+            for (int j = h - 1; j <= h + 1; j++) {
+                if (j < 0 || j >= height || (i == w && j == h)) {
+                    continue;
+                }
+                PixelRGB neighbourhood = imgMatrix.get(i).get(j);
+                if (!center.equals(neighbourhood)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

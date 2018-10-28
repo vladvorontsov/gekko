@@ -151,4 +151,12 @@ public class PixelRGB extends Pixel {
         pixelRGB.setBlue(this.blue);
         return pixelRGB;
     }
+
+    public static PixelRGB getBlackRGB() {
+        return createPixelFromRGB(0, 0, 0);
+    }
+
+    public static PixelRGB getWhiteRGB() {
+        return createPixelFromRGB(255, 255, 255);
+    }
 }
